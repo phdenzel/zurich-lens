@@ -8,7 +8,7 @@ markdown: redcarpet
 permalink: pretty
 # port: 8000
 sass:
-  sass_dir: /zurich_lens/assets/css
+  sass_dir: assets/css
   style: nested
 
 # Site settings
