@@ -158,8 +158,8 @@ function updatecanvas(canvas, px, py) {
 var img = new Image();
 
 if(window.innerWidth > 1366){
-    img.src = "/assets/images/zurich.jpg";
+    img.src = "assets/images/zurich.jpg";
 }
 else{
-    img.src = "/assets/images/zurich-2.jpg";
+    img.src = "assets/images/zurich-2.jpg";
 }
