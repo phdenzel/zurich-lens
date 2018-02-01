@@ -6,18 +6,18 @@
 #            Changes to this file need a restart of the server process.
 markdown: redcarpet
 permalink: pretty
-#port: 8000
+port: 8000
 sass:
   sass_dir: assets/css
   style: nested
 
 # Site settings
 # - use the variables to dynamically write your code for the website
-title: Zurich lensed
+title: CERN lensed
 email: phdenzel@physik.uzh.ch
 description: > # this means ignore newlines until "baseurl:"
   Description of the most awesomest site of awsome sites...
-baseurl: "/zurich_lens" # subpath of the site, e.g. /blog
+#baseurl: "/zurich_lens" # subpath of the site, e.g. /blog
 #url: "" # the base hostname & protocol for the site 
 #github_username: phdenzel
 #twitter_username: @phdenzel
