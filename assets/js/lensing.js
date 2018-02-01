@@ -67,7 +67,7 @@ function updatecanvas(canvas, px, py) {
     var context = canvas.getContext('2d');
 
     // define region where lensing is applied
-    r = 200;
+    r = 400;
 
     xmin = Math.max(oldx-r, 0);
     xmax = Math.min(oldx+r, w);
@@ -109,7 +109,7 @@ function updatecanvas(canvas, px, py) {
             if (d <= r) {
                 // lensing math
                 // sc = 0; // no lensing
-                sc = 200*(1-Math.tanh(3*d/r))/(d+1);  // smooth transition to sc=0 at r
+                sc = 400*(1-Math.tanh(3*d/r))/(d+1);  // smooth transition to sc=0 at r
                 // isothermal lensing equation a la beta = theta - theta_E/theta
                 xx = Math.floor(x - x1 * sc); 
                 yy = Math.floor(y - y1 * sc);
