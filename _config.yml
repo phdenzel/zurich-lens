@@ -6,7 +6,7 @@
 #            Changes to this file need a restart of the server process.
 markdown: redcarpet
 permalink: pretty
-# port: 8000
+#port: 8000
 sass:
   sass_dir: assets/css
   style: nested
@@ -18,6 +18,6 @@ email: phdenzel@physik.uzh.ch
 description: > # this means ignore newlines until "baseurl:"
   Description of the most awesomest site of awsome sites...
 baseurl: "/zurich_lens" # subpath of the site, e.g. /blog
-#url: "http://phdenzel.io" # the base hostname & protocol for the site 
+#url: "" # the base hostname & protocol for the site 
 #github_username: phdenzel
-#twitter_username:
+#twitter_username: @phdenzel

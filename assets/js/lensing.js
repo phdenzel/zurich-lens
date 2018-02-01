@@ -1,20 +1,41 @@
+// CERN lensing
+// image data
+var imageDataDst, imageDataSrc;
+
+// temporary postion variables
 var oldx = 0;
 var oldy = 0;
 
-var imageDataDst, imageDataSrc;
+// linear interpolation
+var lerp = function(v1, v2, t) {
+    // 
+    return (v2 - v1) * (1-Math.exp(-t)) + v1;
+};
 
-w = 1024;
-h = 512;
+// mouse tracking
+function getMousePos(evt) {
 
-var lerp = function(a, b, t) {
-    return (b - a) * (1-Math.exp(-t)) + a;
-}
+    return { // problems with floats, use rather integers
+        x: (evt.clientX / $(window).width() * canvas.width) >> 0,
+        y: (evt.clientY / $(window).height() * canvas.height) >> 0
+    };
+};
 
+// custom event listener
+function lensingListener(evt){
+    var mousePos = getMousePos(evt);
+    console.log(mousePos);
+    updatecanvas(canvas, mousePos.x, mousePos.y);
+};
+
+// apply lensing manipulation
 window.onload = function() {
+
+    canvas = document.querySelector("canvas");
+
     w = img.width;
     h = img.height;
 
-    canvas = document.querySelector("canvas");
     canvas.width = w;
     canvas.height = h;
 
@@ -26,121 +47,86 @@ window.onload = function() {
     imageDataDst = dst.getImageData(0, 0, w, h);
 
     px = 0;
-    py = 320;
+    py = h/2;
 
     ti = 0;
     var timer = setInterval(function() {
-        if (ti++ > 100){
-            clearInterval(timer);
-			      canvas.addEventListener('mousemove', function(evt) {
-			          var mousePos = getMousePos(canvas, evt);
-			          updatecanvas(canvas, mousePos.x, mousePos.y);
-            }, false);
-		    }
+        // if (ti++ > 100){
+        clearInterval(timer);
+        document.addEventListener('mousemove', lensingListener, false);
+		    // }
 
-        updatecanvas(canvas, lerp(0,900 , ti / 20), py);
+        // updatecanvas(canvas, lerp(0, w*0.5, ti*0.05), py);
 
     }, 16);
 
 };
 
-
-var smootherstep = function(t) {
-    //return 1/(Math.exp(-5*t+Math.E)) - Math.exp(-Math.E);
-    return 1 / (Math.exp(-6 * t + 3)) - Math.exp(-3);
-};
-
-
-function getMousePos(canvas, evt) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
-}
-
-
+// actual lensing math
 function updatecanvas(canvas, px, py) {
     var context = canvas.getContext('2d');
 
-    r = 100;
-    xmin = oldx - r;
-    xmax = oldx + r;
-    if (xmin < 0) {
-        xmin = 0;
-    }
-    if (xmax > w) {
-        xmax = w;
-    }
-    ymin = oldy - r;
-    ymax = oldy + r;
+    // define region where lensing is applied
+    r = 200;
 
-    if (ymin < 0) {
-        ymin = 0;
-    }
-    if (ymax > h) {
-        ymax = h;
-    }
+    xmin = Math.max(oldx-r, 0);
+    xmax = Math.min(oldx+r, w);
+    ymin = Math.max(oldy-r, 0);
+    ymax = Math.min(oldy+r, h);
+
+    // reload unlensed image
+    var halfindex;
     for (y = ymin; y < ymax; y++) {
+        halfindex = y * w;
         for (x = xmin; x < xmax; x++) {
-            index = (x + y * w) << 2;
-            imageDataDst.data[index] = imageDataSrc.data[index++];
-            imageDataDst.data[index] = imageDataSrc.data[index++];
-            imageDataDst.data[index] = imageDataSrc.data[index++];
-            imageDataDst.data[index] = 255;
+            index = (x + halfindex) << 2;
+            imageDataDst.data[index] = imageDataSrc.data[index++]; // r
+            imageDataDst.data[index] = imageDataSrc.data[index++]; // g
+            imageDataDst.data[index] = imageDataSrc.data[index++]; // b
+            imageDataDst.data[index] = 255;                        // a
         }
     }
 
+    // buffer Uint8ClampedArrays
     var dstdata = imageDataDst.data;
     var srcdata = imageDataSrc.data;
 
-    xmin = px - r;
-    xmax = px + r;
-    ymin = py - r;
-    ymax = py + r;
-
-
-    if (xmin < 0) {
-        xmin = 0;
-    }
-    if (xmax > w) {
-        xmax = w;
-    }
-
-    if (ymin < 0) {
-        ymin = 0;
-    }
-    if (ymax > h) {
-        ymax = h;
-    }
+    xmin = Math.max(px-r, 0);
+    xmax = Math.min(px+r, w);
+    ymin = Math.max(py-r, 0);
+    ymax = Math.min(py+r, h);
 
     var tol = -15;
     var maxSize = w * (h - 1) + w - 1;
 
+    // apply lens in defined range
     for (y = ymin; y < ymax; y++) {
         index = (xmin + y * w) << 2;
+        y1 = y - py;
         for (x = xmin; x < xmax; x++) {
             x1 = x - px;
-            y1 = y - py;
             d = Math.sqrt(x1 * x1 + y1 * y1);
             if (d <= r) {
-                sc = 1 - smootherstep((r - d) / r);
-                //sc = 1;
-                xx = Math.floor(px + x1 * sc);
-                yy = Math.floor(py + y1 * sc);
+                // lensing math
+                // sc = 0; // no lensing
+                sc = 200*(1-Math.tanh(3*d/r))/(d+1);  // smooth transition to sc=0 at r
+                // isothermal lensing equation a la beta = theta - theta_E/theta
+                xx = Math.floor(x - x1 * sc); 
+                yy = Math.floor(y - y1 * sc);
 
-                //Antialiasing
+                // Antialiasing, i.e. preserve brightness more or less
                 if (sc < tol * 0.9 && sc > tol * 1.1)
                     sc = 0.9;
                 else if (sc < tol)
                     sc = 0.1;
                 else
                     sc = 1;
-                //end of lens math
+                // end of lensing math
+
                 index2 = ((xx + yy * w) % maxSize) << 2;
-                dstdata[index++] = sc * srcdata[index2 + 0];
-                dstdata[index++] = sc * srcdata[index2 + 1];
-                dstdata[index++] = sc * srcdata[index2 + 2];
+                dstdata[index++] = sc * srcdata[index2 + 0]; // r
+                dstdata[index++] = sc * srcdata[index2 + 1]; // g
+                dstdata[index++] = sc * srcdata[index2 + 2]; // b
                 index++;
             } else {
                 index = index + 4;
@@ -148,18 +134,53 @@ function updatecanvas(canvas, px, py) {
         }
     }
 
+    // write from buffer
     imageDataDst.data = dstdata;
     dst.putImageData(imageDataDst, 0, 0);
     oldx = px;
     oldy = py;
-}
+};
 
+function clearcanvas(){
+  canvas = document.querySelector("canvas");
+  var context = canvas.getContext('2d');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  // var w = canvas.width;
+  // canvas.width = 1;
+  // canvas.width = w;
+};
 
+function load_lensing(){
+    canvas = document.querySelector("canvas");
+
+    w = img.width;
+    h = img.height;
+
+    canvas.width = w;
+    canvas.height = h;
+
+    dst = canvas.getContext("2d");
+
+    dst.drawImage(img, 0, 0, w, h);
+    i = 0;
+    imageDataSrc = dst.getImageData(0, 0, w, h);
+    imageDataDst = dst.getImageData(0, 0, w, h);
+
+    px = 0;
+    py = h/2;
+
+    ti = 0;
+    var timer = setInterval(function() {
+        if (ti++ > 100){
+            clearInterval(timer);
+            document.addEventListener('mousemove', lensingListener, false);
+		    }
+
+        updatecanvas(canvas, lerp(0, w*0.5, ti*0.05), py);
+
+    }, 16);
+};
+
+// create Image
 var img = new Image();
-
-if(window.innerWidth > 1366){
-    img.src = "assets/images/zurich.jpg";
-}
-else{
-    img.src = "assets/images/zurich-2.jpg";
-}
+img.src = "assets/images/zurich.jpg";
