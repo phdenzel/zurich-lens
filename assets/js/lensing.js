@@ -127,7 +127,6 @@ var LensModule = (function() {
         dstID.data = dstData;
     }
 
-
     function isothermLens(lensData, unlensedData, px, py) {
         // lens applicator following isothermal lens equation
         // with smooth transition from center to radius
@@ -178,7 +177,6 @@ var LensModule = (function() {
                 }
             }
         }
-
         return lensData;
     }
 
