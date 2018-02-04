@@ -183,4 +183,5 @@ function load_lensing(){
 
 // create Image
 var img = new Image();
-img.src = "assets/images/zurich.jpg";
+// img.src = "assets/images/zurich.jpg";
+img.src = "assets/images/cern.jpg";
