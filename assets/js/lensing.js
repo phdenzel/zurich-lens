@@ -211,8 +211,6 @@ var LensModule = (function() {
     }
 
 
-
-
     // getters and setters
     function getLensType() {
         return lensType;
