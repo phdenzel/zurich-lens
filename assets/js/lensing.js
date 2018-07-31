@@ -75,6 +75,7 @@ var LensModule = (function() {
     }
 
 
+<<<<<<< HEAD
     function source(px, py, dstID, srcID) {
         // put the source image data back into destination image data at (px, py)
         dstID = dstID || imageDataDst;
@@ -102,6 +103,10 @@ var LensModule = (function() {
             }
         }
     }
+=======
+    // define region where lensing is applied
+    r = 400;
+>>>>>>> 4ff494395f0ea892b77b2d275d5615d73d142e76
 
 
     function process(px, py, dstID, srcID) {
