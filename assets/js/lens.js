@@ -3,7 +3,7 @@ var ww = window.innerWidth;
 var wh = window.innerHeight;
 var dst = document.getElementById('dst');
 var img = new Image();
-img.src = "assets/images/zurich.jpg"
+img.src = "assets/images/cern.jpg"
 
 
 function loadSrc(resolve) {
