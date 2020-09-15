@@ -2,7 +2,7 @@
 
 A javascript app to lens pictures of Zurich.
 
-[https://phdenzel.github.io/zurich_lens/](https://phdenzel.github.io/zurich_lens/)
+[https://phdenzel.github.io/zurich-lens/](https://phdenzel.github.io/zurich-lens/)
 
 
 ### References
