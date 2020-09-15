@@ -15,7 +15,6 @@ function loadSrc(resolve) {
 function loop() {
     // console.log(LensModule);
     LensModule.startLoop();
-    
 }
 
 
